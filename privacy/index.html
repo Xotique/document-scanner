@@ -49,7 +49,10 @@ footer { margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--line);
 <li>The documents you scan or import</li>
 <li>The images captured by the camera</li>
 <li>Text produced by text recognition</li>
-<li>QR codes and barcodes you scan, and any link they contain</li>
+<li>QR codes and barcodes you scan, and any link they contain (a history is kept **on</li>
+</ul>
+<p>your device** so you can find them again — see below — but none of it is sent anywhere)</p>
+<ul>
 <li>File names, folder names, or search queries</li>
 <li>Anything you type into the app</li>
 </ul>
@@ -78,6 +81,7 @@ footer { margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--line);
 <tr><td>Install referrer</td><td>Google's ad attribution.</td></tr>
 <tr><td>Vibrate, Wake lock</td><td>Required by the notification library. Nothing here vibrates or keeps your screen on.</td></tr>
 <tr><td>Foreground service</td><td>Arrives with Google's ML Kit. This app declares no foreground service and runs nothing in the background.</td></tr>
+<tr><td>Biometrics, Fingerprint</td><td>Only so the private safe can offer fingerprint or face unlock. Android performs the check and tells this app yes or no — it never receives your fingerprint, your face, or anything derived from them. If you do not use the safe, nothing ever asks.</td></tr>
 </tbody></table>
 <p>You can check this yourself in Android Settings → Apps → Scan Vault → Permissions.</p>
 <h3>Where Google fits in</h3>
@@ -100,6 +104,8 @@ footer { margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--line);
 <p>The code is decoded on your phone. What it contains is shown to you and is not sent anywhere, recorded, or kept after you leave the screen.</p>
 <p>The app deliberately does <strong>not</strong> check a scanned link against any online safety or reputation service. Doing so would mean sending your scan to a third party, which is the one thing this app promises not to do. Instead it examines the link itself — for a web address disguised to look like a different one, for characters from another alphabet, for a shortened link whose destination is hidden — and tells you what it found.</p>
 <p>Because of that, the warnings are not a guarantee that a link is safe, only that nothing about its text is suspicious. Nothing is ever opened without you choosing to open it, and when you do, the link is handed to whichever app you have chosen to handle it. What happens after that is between you and that app.</p>
+<p><strong>Scans are kept on your phone so you can find them again.</strong> The scanner keeps a history of the codes you have scanned — the most recent 200 — so you do not have to go back to the poster or the ticket to read one a second time. It is stored in this app's private area on your device, exactly like your documents, and is never uploaded.</p>
+<p>Be aware of what that means: the history holds each code's contents as they were read. If you scan a Wi-Fi code, the network's password is part of that code and is therefore part of the history. You can delete any single entry, or clear the whole history, from the History tab on the scanner screen. It is also removed when you uninstall the app.</p>
 <h2>Your documents and uninstalling</h2>
 <p>Documents live in this app's private storage. <strong>Uninstalling the app deletes them permanently</strong>, and no copy exists anywhere else for us to restore. Use <em>Save to device</em> or <em>Share</em> to keep anything you need before uninstalling or changing phones.</p>
 <p>Deleted documents sit in the recycle bin for 7 days — 30 days with Pro — and are then erased permanently.</p>
