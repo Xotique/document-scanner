@@ -42,6 +42,7 @@ footer { margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--line);
 <h2>The short version</h2>
 <p>Your documents never leave your device.</p>
 <p>Scanning, text recognition, merging, splitting, compressing, password protection — all of it runs on your phone. There is no account, no sign-in, and no server that receives your files. We could not read your documents if we wanted to, because they are never sent anywhere.</p>
+<p>One qualification, because it is the honest version of that sentence: the camera screen you scan with belongs to Google Play Services, not to us. See <a href="#where-google-fits-in">Where Google fits in</a>.</p>
 <h2>What we do not collect</h2>
 <p>We do not collect, transmit, store, or have any access to:</p>
 <ul>
@@ -79,8 +80,17 @@ footer { margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--line);
 <tr><td>Foreground service</td><td>Arrives with Google's ML Kit. This app declares no foreground service and runs nothing in the background.</td></tr>
 </tbody></table>
 <p>You can check this yourself in Android Settings → Apps → Scan Vault → Permissions.</p>
-<p><strong>No storage permission.</strong> When you import or save a file, Android's own file picker asks you to choose it, and the app is granted access to exactly that file or folder and nothing else.</p>
-<p><strong>No camera permission either.</strong> Scanning runs inside Google Play Services, under its own camera permission; this app only ever receives the finished image. So the app cannot open your camera, and it has no way to read your photo library. Code scanning works the same way — Play Services runs the camera and hands back only the decoded text.</p>
+<h3>Where Google fits in</h3>
+<p>Two parts of this app are Google's code rather than ours, and it is worth being exact about which.</p>
+<p><strong>Text recognition runs inside this app.</strong> The model is built into the download — which is most of the app's size — and reads pages in Scan Vault's own process. It needs no connection and involves Google Play Services in no way.</p>
+<p><strong>Capturing does not.</strong> When you tap Scan, or scan a QR code, the camera screen is provided by Google Play Services and runs in Google's process, under Google's camera permission. The page you are photographing passes through Google's code before it reaches ours. Google documents both of these as processing entirely on your device and states that images are not uploaded, and we have no reason to think otherwise — but it is Google's software, and we cannot audit it any more than you can. So the accurate statement is: <strong>Scan Vault never transmits your documents, and the capture step relies on Google Play Services behaving as Google documents.</strong></p>
+<p>We chose this deliberately. The alternative is for the app to operate the camera itself, which would mean asking you for camera permission, and would not remove Google from the picture — Play Services already runs on your phone with more access than this app will ever have. If you would rather not use it at all, photograph a document with any camera app you trust and import the image; everything after that point is ours.</p>
+<h3>How it scans and opens files without those permissions</h3>
+<p>This sounds like a contradiction, so it is worth explaining. On Android there are two ways to reach the camera or your files: an app can hold a permission and do it itself whenever it likes, or it can ask a part of the system that already holds that permission to do the job and hand back the result. Scan Vault always does the second.</p>
+<p><strong>Scanning.</strong> Tapping Scan opens a camera screen belonging to <em>Google Play Services</em>, running under Google's camera permission, not ours. You frame the page there, it detects the edges, and it passes back a finished image. This app never receives a camera feed and cannot turn the camera on. Scanning QR codes and barcodes works the same way.</p>
+<p><strong>Opening and saving files.</strong> Choosing a file opens Android's own file picker. You pick the file; Android then grants this app access to exactly that file, and nothing else in your storage. Saving works the same way with a folder you choose. This is Android's Storage Access Framework, and it is the method Google now recommends in place of the old blanket storage permission.</p>
+<p><strong>Your scanned documents</strong> are kept in this app's private area, which no app needs a permission to use — every Android app can read and write its own. It is also why they are removed when you uninstall.</p>
+<p>There is one real consequence, and it is a limitation rather than a trick: <strong>the app cannot browse your storage or your photo library.</strong> It only ever sees what you hand it, one file at a time.</p>
 <h2>Scanning QR codes and barcodes</h2>
 <p>The code is decoded on your phone. What it contains is shown to you and is not sent anywhere, recorded, or kept after you leave the screen.</p>
 <p>The app deliberately does <strong>not</strong> check a scanned link against any online safety or reputation service. Doing so would mean sending your scan to a third party, which is the one thing this app promises not to do. Instead it examines the link itself — for a web address disguised to look like a different one, for characters from another alphabet, for a shortened link whose destination is hidden — and tells you what it found.</p>
