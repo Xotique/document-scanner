@@ -48,6 +48,7 @@ footer { margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--line);
 <li>The documents you scan or import</li>
 <li>The images captured by the camera</li>
 <li>Text produced by text recognition</li>
+<li>QR codes and barcodes you scan, and any link they contain</li>
 <li>File names, folder names, or search queries</li>
 <li>Anything you type into the app</li>
 </ul>
@@ -79,7 +80,11 @@ footer { margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--line);
 </tbody></table>
 <p>You can check this yourself in Android Settings → Apps → Scan Vault → Permissions.</p>
 <p><strong>No storage permission.</strong> When you import or save a file, Android's own file picker asks you to choose it, and the app is granted access to exactly that file or folder and nothing else.</p>
-<p><strong>No camera permission either.</strong> Scanning runs inside Google Play Services, under its own camera permission; this app only ever receives the finished image. So the app cannot open your camera, and it has no way to read your photo library.</p>
+<p><strong>No camera permission either.</strong> Scanning runs inside Google Play Services, under its own camera permission; this app only ever receives the finished image. So the app cannot open your camera, and it has no way to read your photo library. Code scanning works the same way — Play Services runs the camera and hands back only the decoded text.</p>
+<h2>Scanning QR codes and barcodes</h2>
+<p>The code is decoded on your phone. What it contains is shown to you and is not sent anywhere, recorded, or kept after you leave the screen.</p>
+<p>The app deliberately does <strong>not</strong> check a scanned link against any online safety or reputation service. Doing so would mean sending your scan to a third party, which is the one thing this app promises not to do. Instead it examines the link itself — for a web address disguised to look like a different one, for characters from another alphabet, for a shortened link whose destination is hidden — and tells you what it found.</p>
+<p>Because of that, the warnings are not a guarantee that a link is safe, only that nothing about its text is suspicious. Nothing is ever opened without you choosing to open it, and when you do, the link is handed to whichever app you have chosen to handle it. What happens after that is between you and that app.</p>
 <h2>Your documents and uninstalling</h2>
 <p>Documents live in this app's private storage. <strong>Uninstalling the app deletes them permanently</strong>, and no copy exists anywhere else for us to restore. Use <em>Save to device</em> or <em>Share</em> to keep anything you need before uninstalling or changing phones.</p>
 <p>Deleted documents sit in the recycle bin for 7 days — 30 days with Pro — and are then erased permanently.</p>
