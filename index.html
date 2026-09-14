@@ -3,49 +3,307 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Scan Vault — offline document scanner</title>
+<title>Scan Vault — a document scanner that keeps every page on your phone</title>
+<meta name="description" content="Scan documents to PDF, search the text inside them, compress, sign and protect files — all on your Android phone. No account, no upload, no cloud.">
+<link rel="canonical" href="https://xotique.github.io/document-scanner/">
+<link rel="icon" href="/document-scanner/assets/favicon.png" type="image/png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Scan Vault — a document scanner that keeps every page on your phone">
+<meta property="og:description" content="Scan documents to PDF, search the text inside them, compress, sign and protect files — all on your Android phone. No account, no upload, no cloud.">
+<meta property="og:image" content="https://xotique.github.io/document-scanner/assets/og.png">
+<meta name="theme-color" content="#F0F2F4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1016" media="(prefers-color-scheme: dark)">
 <style>
-:root { color-scheme: light dark; --bg:#FCFCFD; --fg:#151923; --muted:#5B6478;
-        --line:#E3E6EC; --accent:#3042B5; --card:#FFFFFF; }
+:root { color-scheme: light dark;
+  --bg:#F0F2F4; --card:#FFFFFF; --fg:#151923; --muted:#5B6478; --line:#E4E8EE;
+  --primary:#3042B5; --on-primary:#FFFFFF; --soft:#E6E9F7;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 16px 40px -18px rgba(16,24,40,.22);
+  --display:"Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono:ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, Consolas, monospace; }
 @media (prefers-color-scheme: dark) {
-  :root { --bg:#0E1016; --fg:#EDEFF4; --muted:#9AA3B8; --line:#232838;
-          --accent:#6D7DE3; --card:#161A24; }
+  :root { --bg:#0E1016; --card:#161A24; --fg:#EDEFF4; --muted:#9AA3B8; --line:#232838;
+    --primary:#5A82F0; --on-primary:#0E1016; --soft:#1A2238;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 16px 40px -18px rgba(0,0,0,.7); }
 }
-* { box-sizing: border-box; }
-body { margin:0; background:var(--bg); color:var(--fg); line-height:1.65;
-       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-main { max-width: 46rem; margin: 0 auto; padding: 3rem 1.25rem 6rem; }
-h1 { font-size: 2rem; line-height:1.2; margin: 0 0 .5rem; letter-spacing:-.02em; }
-h2 { font-size: 1.3rem; margin: 2.5rem 0 .75rem; letter-spacing:-.01em; }
-h3 { font-size: 1.05rem; margin: 1.75rem 0 .5rem; }
-p, li { color: var(--fg); }
-a { color: var(--accent); }
-code { background: var(--card); border:1px solid var(--line); border-radius:4px;
-       padding:.1em .35em; font-size:.9em; }
-blockquote { border-left:3px solid var(--line); margin:1.5rem 0; padding:.25rem 0 .25rem 1rem;
-             color: var(--muted); font-size:.95rem; }
-table { border-collapse: collapse; width:100%; margin:1.25rem 0; display:block;
-        overflow-x:auto; font-size:.95rem; }
-th, td { border:1px solid var(--line); padding:.6rem .75rem; text-align:left; vertical-align:top; }
-th { background: var(--card); }
-nav { border-bottom:1px solid var(--line); padding:1rem 1.25rem; }
-nav a { margin-right:1.25rem; text-decoration:none; font-weight:500; }
-footer { margin-top:4rem; padding-top:1.5rem; border-top:1px solid var(--line);
-         color:var(--muted); font-size:.9rem; }
+@font-face { font-family:"Archivo"; font-style:normal; font-weight:700; font-display:swap;
+  src:url("/document-scanner/assets/archivo-700.ttf") format("truetype"); }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); line-height:1.6;
+  font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing:antialiased; }
+a { color:var(--primary); text-underline-offset:.15em; }
+img { max-width:100%; }
+.wrap { max-width:72rem; margin:0 auto; padding-inline:1.25rem; }
+
+.site-nav { position:sticky; top:0; z-index:10; background:var(--bg);
+  background:color-mix(in srgb, var(--bg) 86%, transparent);
+  -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); border-bottom:1px solid var(--line); }
+.site-nav .wrap { display:flex; align-items:center; gap:1rem; min-height:3.75rem; }
+.brand { display:inline-flex; align-items:center; gap:.6rem; color:var(--fg); text-decoration:none;
+  font-family:var(--display); font-weight:700; font-size:1.1rem; letter-spacing:-.01em; }
+.brand img { border-radius:8px; }
+.links { margin-left:auto; display:flex; gap:1.25rem; }
+.links a { color:var(--muted); text-decoration:none; font-weight:500; font-size:.95rem; }
+.links a:hover { color:var(--fg); }
+.site-foot { margin-top:5rem; border-top:1px solid var(--line); color:var(--muted); font-size:.9rem; }
+.site-foot .wrap { display:flex; flex-wrap:wrap; justify-content:space-between; gap:.5rem 2rem; padding-block:2rem 3rem; }
+.site-foot a { color:inherit; }
+
+.prose { max-width:46rem; margin:0 auto; padding:3rem 1.25rem 1rem; }
+.prose h1 { font-family:var(--display); font-size:clamp(2rem, 5vw, 2.6rem); line-height:1.1; letter-spacing:-.02em; margin:0 0 .75rem; }
+.prose h2 { font-family:var(--display); font-size:1.4rem; line-height:1.25; letter-spacing:-.01em; margin:2.75rem 0 .75rem; }
+.prose h3 { font-size:1.05rem; margin:1.75rem 0 .5rem; }
+.prose code { background:var(--card); border:1px solid var(--line); border-radius:4px; padding:.1em .35em; font-size:.9em; }
+.prose table { border-collapse:collapse; width:100%; margin:1.25rem 0; display:block; overflow-x:auto; font-size:.95rem; }
+.prose th, .prose td { border:1px solid var(--line); padding:.6rem .75rem; text-align:left; vertical-align:top; }
+.prose th { background:var(--card); }
+
+.eyebrow { font:600 .78rem/1.2 var(--mono); letter-spacing:.08em; text-transform:uppercase; color:var(--primary); margin:0; }
+.display { font-family:var(--display); font-weight:700; letter-spacing:-.025em; line-height:1.05; margin:0; text-wrap:balance; }
+.lead { font-size:clamp(1.05rem, 1.5vw, 1.2rem); color:var(--muted); margin:0; max-width:38rem; }
+.block { padding-top:5.5rem; }
+
+.hero-band { overflow-x:clip; }
+.hero { display:grid; grid-template-columns:1.1fr .9fr; gap:2rem; align-items:center; padding-block:4.5rem 3.5rem; }
+.hero h1 { font-size:clamp(2.6rem, 6vw, 4.4rem); margin:1rem 0 1.25rem; }
+.chips { list-style:none; margin:1.75rem 0 0; padding:0; display:flex; flex-wrap:wrap; gap:.5rem; }
+.chips li { background:var(--card); box-shadow:var(--shadow); border-radius:999px; padding:.45rem .95rem; font-weight:600; font-size:.92rem; }
+.availability { margin:1.5rem 0 0; color:var(--muted); font-size:.95rem; }
+.hero-art { position:relative; display:flex; justify-content:center; padding-block:1rem; }
+.phone { margin:0; width:17rem; max-width:100%; aspect-ratio:540/1200; padding:.42rem; border-radius:2.35rem; background:#08090D;
+  box-shadow:0 50px 90px -40px rgba(16,24,40,.55), inset 0 0 0 1px rgba(255,255,255,.1); }
+.phone img { display:block; width:100%; height:100%; object-fit:cover; border-radius:1.95rem; }
+.hero-art .front { position:relative; z-index:1; transform:translateX(22%); }
+.hero-art .back { position:absolute; top:3rem; left:50%; transform:translateX(-88%) rotate(-6deg) scale(.9); }
+
+.promises { display:grid; grid-template-columns:repeat(3, 1fr); gap:1rem; }
+.card { background:var(--card); border-radius:22px; padding:1.6rem; box-shadow:var(--shadow); }
+.card h3 { font-family:var(--display); font-size:1.2rem; line-height:1.25; letter-spacing:-.01em; margin:1rem 0 .45rem; }
+.card p { margin:0; color:var(--muted); }
+.card p + p { margin-top:.75rem; }
+.icon { display:grid; place-items:center; width:2.75rem; height:2.75rem; border-radius:14px; background:var(--soft); color:var(--primary); }
+.icon svg { width:1.4rem; height:1.4rem; }
+
+.feature { display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; padding-block:4.5rem; }
+.feature + .feature { border-top:1px solid var(--line); }
+.feature.flip .copy { order:2; }
+.feature h2 { font-size:clamp(1.9rem, 3.6vw, 2.8rem); margin:.8rem 0 1rem; }
+.feature .copy > p { color:var(--muted); font-size:1.08rem; margin:0; max-width:34rem; }
+.ticks { list-style:none; margin:1.4rem 0 0; padding:0; display:grid; gap:.6rem; }
+.ticks li { position:relative; padding-left:1.7rem; }
+.ticks li::before { content:""; position:absolute; left:.3rem; top:.42em; width:.4rem; height:.75rem;
+  border:solid var(--primary); border-width:0 2.5px 2.5px 0; transform:rotate(45deg); }
+.shot { display:flex; justify-content:center; }
+.pair { gap:1.25rem; align-items:flex-start; }
+.pair .phone { width:15rem; }
+.pair .lower { margin-top:3.5rem; }
+
+.duo { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.duo .card { padding:2rem; }
+.duo .eyebrow { margin-top:1.1rem; color:var(--primary); }
+.duo h3 { font-size:1.45rem; margin-top:.5rem; }
+.aside { font-size:.92rem; border-top:1px solid var(--line); padding-top:.9rem; }
+
+.section-head { max-width:44rem; margin:0 0 2rem; }
+.section-head h2 { font-size:clamp(1.9rem, 3.6vw, 2.8rem); margin:.8rem 0 .9rem; }
+
+.plans { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.plan { background:var(--card); border-radius:28px; padding:2rem; box-shadow:var(--shadow); }
+.plan h3 { font-family:var(--display); font-size:1.6rem; letter-spacing:-.02em; margin:0; }
+.plan .sub { color:var(--muted); margin:.35rem 0 0; }
+.plan.pro { background:var(--primary); color:var(--on-primary); }
+.plan.pro .sub, .plan.pro .fine { color:inherit; opacity:.85; }
+.plan.pro .ticks li::before { border-color:currentColor; }
+.fine { font-size:.9rem; margin:1.5rem 0 0; }
+
+.changes { list-style:none; margin:0; padding:0; background:var(--card); border-radius:28px; box-shadow:var(--shadow); }
+.changes li { display:grid; grid-template-columns:8.5rem 1fr; gap:1rem; padding:1.15rem 1.75rem; }
+.changes li + li { border-top:1px solid var(--line); }
+.tag { font:600 .74rem/1.9 var(--mono); letter-spacing:.07em; text-transform:uppercase; color:var(--primary); }
+.changes strong { display:block; font-size:1.02rem; }
+.changes span:not(.tag) { color:var(--muted); }
+
+.callout { background:var(--soft); border-radius:28px; padding:clamp(1.75rem, 4vw, 3rem); }
+.callout h2 { font-size:clamp(1.7rem, 3vw, 2.3rem); margin:0 0 1rem; }
+.callout p { max-width:44rem; margin:0; }
+.callout .actions { display:flex; flex-wrap:wrap; gap:.75rem 1.25rem; align-items:center; margin-top:1.75rem; }
+.button { display:inline-block; background:var(--primary); color:var(--on-primary); text-decoration:none; font-weight:600; padding:.8rem 1.3rem; border-radius:999px; }
+
+@media (max-width:60rem) {
+  .hero { grid-template-columns:1fr; padding-block:3rem 1.5rem; }
+  .hero-art .phone { width:14.5rem; }
+  .promises, .duo, .plans { grid-template-columns:1fr; }
+  .feature { grid-template-columns:1fr; gap:2.25rem; padding-block:3.25rem; }
+  .feature.flip .copy { order:0; }
+}
+@media (max-width:34rem) {
+  .links .wide { display:none; }
+  .hero-art .phone { width:12.5rem; }
+  .hero-art .front { transform:translateX(18%); }
+  .hero-art .back { transform:translateX(-80%) rotate(-6deg) scale(.9); }
+  .pair { gap:.75rem; }
+  .pair .phone { width:calc(50% - .375rem); padding:.3rem; border-radius:1.6rem; }
+  .pair .phone img { border-radius:1.3rem; }
+  .pair .lower { margin-top:2rem; }
+  .changes li { grid-template-columns:1fr; gap:.2rem; padding:1rem 1.25rem; }
+}
 </style>
 </head>
 <body>
-<nav><a href="/document-scanner/">Scan Vault</a><a href="/document-scanner/privacy">Privacy</a><a href="/document-scanner/terms">Terms</a></nav>
+<header class="site-nav"><div class="wrap">
+<a class="brand" href="/document-scanner/"><img src="/document-scanner/assets/favicon.png" alt="" width="28" height="28">Scan Vault</a>
+<nav class="links" aria-label="Site"><a class="wide" href="/document-scanner/#features">Features</a><a class="wide" href="/document-scanner/#new">What's new</a><a href="/document-scanner/privacy">Privacy</a><a href="/document-scanner/terms">Terms</a></nav>
+</div></header>
 <main>
-<h1>Scan Vault</h1>
-<p>A document scanner for Android that keeps every page on your phone.</p>
-<p>Scanning, text recognition, merging, compressing and password protection all run on your device. There is no account, no cloud, and no upload — turn on aeroplane mode and everything still works.</p>
-<ul>
-<li><a href="/document-scanner/privacy">Privacy policy</a></li>
-<li><a href="/document-scanner/terms">Terms of service</a></li>
-</ul>
-<p>Contact: xlogikcreations@gmail.com</p>
-<footer>Scan Vault — xLogik · <a href="mailto:xlogikcreations@gmail.com">xlogikcreations@gmail.com</a></footer>
+<section class="hero-band">
+<div class="wrap hero">
+  <div>
+    <p class="eyebrow">Document scanner for Android</p>
+    <h1 class="display">Every page stays on your phone.</h1>
+    <p class="lead">Scan Vault scans documents to PDF, reads the text on every page so you can search it, and compresses, signs and protects your files — all on the device. No account, no upload, no cloud.</p>
+    <ul class="chips" aria-label="At a glance"><li>No account</li><li>No upload</li><li>Works offline</li><li>No storage permission</li></ul>
+    <p class="availability">Android · Coming soon to Google Play</p>
+  </div>
+  <div class="hero-art">
+    <figure class="phone back"><img src="/document-scanner/assets/document.webp" width="540" height="1200" alt="A tenancy agreement open in the viewer, with the page tools along the bottom" loading="lazy" decoding="async"></figure>
+    <figure class="phone front"><img src="/document-scanner/assets/library.webp" width="540" height="1200" alt="The Scan Vault library: page thumbnails of a tenancy agreement, an account statement, a payslip, a motor insurance certificate, an invoice and a pharmacy receipt" fetchpriority="high" decoding="async"></figure>
+  </div>
+</div>
+</section>
+
+<section class="wrap promises" aria-label="What Scan Vault promises">
+  <article class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.6-3 8.3-7 10-4-1.7-7-5.4-7-10V6z"/><path d="M9 12l2 2 4-4"/></svg></span><h3>Nothing leaves your phone</h3><p>Scanning, text recognition, compressing and password protection all run on the device. Turn on aeroplane mode and they still work.</p></article>
+  <article class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2h7.5A2.5 2.5 0 0 1 21 9.5v7A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5z"/></svg></span><h3>No account, no storage access</h3><p>There is nothing to sign up for. Files come in through Android's own picker, so the app only ever sees what you hand it.</p></article>
+  <article class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg></span><h3>Made for everyday phones</h3><p>Pages are processed one at a time, so a forty-page scan does not run a 3&nbsp;GB phone out of memory.</p></article>
+</section>
+
+<section id="features" class="wrap block">
+  <div class="feature">
+    <div class="copy">
+      <p class="eyebrow">Text recognition</p>
+      <h2 class="display">Find a document by what is written in it</h2>
+      <p>Every page is read the moment it arrives — scans, photos and imported PDFs alike — so you can search your whole library for a name, an amount or a reference number.</p>
+      <ul class="ticks">
+        <li>Reading happens on the phone and needs no connection</li>
+        <li>Open the recognised text to read it or copy it out</li>
+        <li>Finding a document by its name is always free and unlimited</li>
+      </ul>
+    </div>
+    <div class="shot pair"><figure class="phone "><img src="/document-scanner/assets/search.webp" width="540" height="1200" alt="Search results for the name Adaeze, found inside the text of several documents" loading="lazy" decoding="async"></figure><figure class="phone lower"><img src="/document-scanner/assets/text.webp" width="540" height="1200" alt="The recognised text of a payslip, ready to read or copy" loading="lazy" decoding="async"></figure></div>
+  </div>
+
+  <div class="feature flip">
+    <div class="copy">
+      <p class="eyebrow">Compress</p>
+      <h2 class="display">See the real size before you commit</h2>
+      <p>Each quality is measured on pages from across your document, so the estimate is what you actually get. Pages are never enlarged, a setting that would not really help is never offered, and if the result is not meaningfully smaller your original stays exactly as it was.</p>
+      <ul class="ticks">
+        <li>High, Medium and Small, each with an honest estimate</li>
+        <li>Imported PDFs are re-drawn as images, and the app tells you before it happens</li>
+      </ul>
+    </div>
+    <div class="shot"><figure class="phone "><img src="/document-scanner/assets/compress.webp" width="540" height="1200" alt="The compress screen for a 9.9 MB scanned PDF, estimating 7.2 MB for High, 4.1 MB for Medium and 2.0 MB for Small" loading="lazy" decoding="async"></figure></div>
+  </div>
+
+  <div class="feature">
+    <div class="copy">
+      <p class="eyebrow">Share and save</p>
+      <h2 class="display">One PDF, or a picture of every page</h2>
+      <p>Send a document to any app, or save it to a folder you choose. It arrives named after your document, not a string of numbers.</p>
+      <ul class="ticks">
+        <li>Free copies carry a small mark in the corner — watch an ad to send one without it</li>
+        <li>Export every document at once to keep a backup</li>
+      </ul>
+    </div>
+    <div class="shot"><figure class="phone "><img src="/document-scanner/assets/share.webp" width="540" height="1200" alt="The share sheet: send as one PDF or one image per page, with the option to leave off the small corner mark" loading="lazy" decoding="async"></figure></div>
+  </div>
+
+  <div class="feature flip">
+    <div class="copy">
+      <p class="eyebrow">Tools</p>
+      <h2 class="display">The rest of your paperwork, on the same phone</h2>
+      <p>Sign with a signature you draw once. Put both sides of an ID card on one page at life size. Merge, split, watermark, add a password, or turn a scan into a PDF whose text you can select.</p>
+      <ul class="ticks">
+        <li>Import PDFs, photos and Word files</li>
+        <li>Turn a document into images, or photos into a PDF</li>
+        <li>Reorder, rotate, crop and insert pages, with undo</li>
+      </ul>
+    </div>
+    <div class="shot"><figure class="phone "><img src="/document-scanner/assets/tools.webp" width="540" height="1200" alt="The tools screen: import a document, document to images, images to PDF, sign, ID card and scan a code" loading="lazy" decoding="async"></figure></div>
+  </div>
+</section>
+
+<section class="wrap duo" aria-label="The safe and the code scanner">
+  <article class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span><p class="eyebrow">Private safe · Pro</p><h3>A private safe for the documents that matter</h3><p>One code — and your fingerprint or face — for everything you move into it. Documents in the safe disappear from your library, your search results and the recycle bin until you unlock it.</p><p class="aside">You will not find a screenshot of it here: the safe blocks screenshots and screen recording, and hides itself in the recent-apps switcher.</p></article>
+  <article class="card"><span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><path d="M14 14h2v2h-2zM18 18h2v2h-2zM14 18h.01M18 14h2"/></svg></span><p class="eyebrow">Code scanner</p><h3>See what a code says before it opens</h3><p>Scan Vault reads QR codes and barcodes, then shows the full address and calls out lookalike links, hidden destinations and other tricks — without looking anything up online. Nothing opens until you choose, and your last 200 scans stay on the phone.</p></article>
+</section>
+
+<section id="pro" class="wrap block">
+  <div class="section-head">
+    <p class="eyebrow">Free and Pro</p>
+    <h2 class="display">A complete scanner, free</h2>
+    <p class="lead">Pro lifts the limits and removes the ads. Your documents are never locked behind it.</p>
+  </div>
+  <div class="plans">
+    <article class="plan">
+      <h3>Free</h3>
+      <p class="sub">Everything you need to scan and keep documents</p>
+      <ul class="ticks">
+        <li>Scan and import as many documents as you like, up to 10 pages a scan</li>
+        <li>Text recognition on every page, and unlimited search by name</li>
+        <li>3 searches inside documents and 3 text opens a day — one more of either for each ad you choose to watch</li>
+        <li>Merge up to three documents at once</li>
+        <li>One high-quality scan a day</li>
+        <li>A small mark on copies you share or save, and ads</li>
+      </ul>
+    </article>
+    <article class="plan pro">
+      <h3>Pro</h3>
+      <p class="sub">The same app, without limits</p>
+      <ul class="ticks">
+        <li>No ads, and no mark on your copies</li>
+        <li>Unlimited searching and text opens</li>
+        <li>Unlimited pages and merges, and high quality on every scan</li>
+        <li>The private safe</li>
+        <li>Password protection and PDFs with selectable text</li>
+        <li>Deleted files recoverable for 30 days instead of 7</li>
+      </ul>
+      <p class="fine">Monthly, 6-monthly or annual. Prices in your currency, and any free trial, are shown in the app before you pay, and you can cancel any time in Google Play.</p>
+    </article>
+  </div>
+</section>
+
+<section id="new" class="wrap block">
+  <div class="section-head">
+    <p class="eyebrow">What's new</p>
+    <h2 class="display">September 2026</h2>
+  </div>
+  <ul class="changes">
+<li><span class="tag">Design</span><div><strong>A calmer, clearer app</strong><span>Grey pages and white cards, one obvious button on each screen, bigger headings and a tab bar that floats above your documents.</span></div></li>
+<li><span class="tag">Compress</span><div><strong>Estimates you can trust</strong><span>Sizes are measured on pages from across the whole document, no page is ever enlarged, and High now shrinks scanned PDFs instead of claiming it would make them bigger.</span></div></li>
+<li><span class="tag">Reading</span><div><strong>Much faster for digital PDFs</strong><span>A PDF that already contains text is read straight from the file on Android 15 and later — seconds, not minutes, for a long document.</span></div></li>
+<li><span class="tag">Import</span><div><strong>Word files in, pictures out</strong><span>Bring in .docx files, turn photos into a PDF, or turn any document into one image per page.</span></div></li>
+<li><span class="tag">Import</span><div><strong>Review before it is added</strong><span>Picked files wait on a review screen, so the wrong file never reaches your library, and a batch lands together.</span></div></li>
+<li><span class="tag">Rewards</span><div><strong>You see what you earned</strong><span>Watch an ad for an extra search, an extra text open or a copy without the mark, and the reward lands on screen once the ad has closed.</span></div></li>
+<li><span class="tag">Safe</span><div><strong>Folders in the private safe</strong><span>Organise private documents into folders, choose a grid or a list, and import files straight into the safe.</span></div></li>
+<li><span class="tag">Codes</span><div><strong>A history of scanned codes</strong><span>Your last 200 QR codes and barcodes stay on the phone, and you can name the ones you use often.</span></div></li>
+<li><span class="tag">Storage</span><div><strong>Free up space</strong><span>Discard the original photos behind your scans once you no longer need to re-edit them. The documents themselves stay as they are.</span></div></li>
+<li><span class="tag">Library</span><div><strong>An Edited view</strong><span>Everything a tool has changed — compressed, signed, watermarked or protected — collected in one place.</span></div></li>
+<li><span class="tag">Search</span><div><strong>Honest while it reads</strong><span>While a big import is still being read, search tells you so instead of quietly returning fewer results.</span></div></li>
+  </ul>
+</section>
+
+<section class="wrap block">
+  <div class="callout">
+    <h2 class="display">One thing we will be straight about</h2>
+    <p>Because nothing is uploaded, your documents exist only on this phone. Uninstalling the app, resetting the phone or losing it deletes them, and there is no copy anywhere for us to restore. Use <strong>Export every document</strong> in Settings to keep a backup of anything you would be sorry to lose.</p>
+    <p class="actions"><a class="button" href="/document-scanner/privacy">Read the privacy policy</a><a href="/document-scanner/terms">Terms of service</a></p>
+  </div>
+</section>
 </main>
+<footer class="site-foot"><div class="wrap">
+<span>Scan Vault — made by xLogik</span>
+<span><a href="mailto:xlogikcreations@gmail.com">xlogikcreations@gmail.com</a> · <a href="/document-scanner/privacy">Privacy</a> · <a href="/document-scanner/terms">Terms</a></span>
+</div></footer>
 </body>
 </html>
